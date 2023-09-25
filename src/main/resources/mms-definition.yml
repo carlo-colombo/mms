@@ -1,0 +1,177 @@
+openapi: 3.0.3
+info:
+  title: Music Metadata Service
+  termsOfService: http://swagger.io/terms/
+  version: 1.0.11
+tags:
+  - name: artist
+paths:
+  /artist:
+    post:
+      tags:
+        - artist
+      summary: Create artist
+      operationId: createArtist
+      requestBody:
+        description: Created artist object
+        content:
+          application/json:
+            schema:
+              properties:
+                name:
+                  type: string
+      responses:
+        "201":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                properties:
+                  id:
+                    type: string
+  /artist/{artistId}:
+    get:
+      tags:
+        - artist
+      operationId: getArtistById
+      parameters:
+        - name: artistId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Artist'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Artist not found
+  /artist/ofTheDay/{date}:
+    get:
+      operationId: getArtistOfTheDay
+      parameters:
+        - name: date
+          in: path
+          required: true
+          schema:
+            type: string
+            format: date
+      tags: [artist]
+      summary: retrieve a new artist of the day
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Artist'
+        '404':
+          description: No artist present
+  /artist/{artistId}/addAlias:
+    put:
+      operationId: addAlias
+      tags:
+        - artist
+      summary: Add alias to an artist
+      requestBody:
+        description: Update an existent artist
+        content:
+          application/json:
+            schema:
+              properties:
+                alias:
+                  type: string
+        required: true
+      description: add alias to an artist
+      parameters:
+        - name: artistId
+          in: path
+          description: Artist id to delete
+          required: true
+          schema:
+            type: string
+      responses:
+        '202':
+          description: Successful operation
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Artist not found
+        '405':
+          description: Validation exception
+  /track:
+    get:
+      tags: [track]
+      responses:
+        "200":
+          description: all tracks
+          content:
+            application/json:
+              schema:
+                properties:
+                  tracks:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Track'
+    post:
+      tags:
+        - track
+      summary: Create track
+      operationId: createTrack
+      requestBody:
+        description: Created track object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Track'
+      responses:
+        "201":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                properties:
+                  id:
+                    type: string
+components:
+  schemas:
+    Track:
+      required:
+        - lengthInSeconds
+        - title
+        - artists
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        genre:
+          type: string
+        lengthInSeconds:
+          type: integer
+          format: int32
+        album:
+          type: string
+        artists:
+          type: array
+          items:
+            $ref: '#/components/schemas/Artist'
+    Artist:
+      type: object
+      properties:
+        id:
+          type: string
+          example: abc-abc
+        names:
+          type: array
+          items:
+            type: string
+        mainName:
+          type: string
+          example: John Doe
